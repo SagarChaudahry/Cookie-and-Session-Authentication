@@ -25,22 +25,44 @@ builder.Services.AddSingleton<IDbConnection>(serviceProvider =>
 
 //Register authentication
 //Cookies
-builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
-    .AddCookie(options =>
-    {
-        options.LoginPath = "/Authentication/Login";
-        options.LogoutPath = "/Authentication/Logout";
-        options.AccessDeniedPath = "/Authentication/AccessDenied";
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
-        options.Cookie.HttpOnly = true;
-    });
+//builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+//    .AddCookie(options =>
+//    {
+//        options.LoginPath = "/Authentication/Login";
+//        options.LogoutPath = "/Authentication/Logout";
+//        options.AccessDeniedPath = "/Authentication/AccessDenied";
+//        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+//        options.Cookie.HttpOnly = true;
+//    });
 
 //Session
-builder.Services.AddSession(options =>
+//builder.Services.AddSession(options =>
+//{
+//    options.IdleTimeout = TimeSpan.FromMinutes(5); 
+//    options.Cookie.HttpOnly = true;
+//    options.Cookie.IsEssential = true;
+//});
+
+
+//JWT Authentication
+builder.Services.AddAuthentication(options =>
 {
-    options.IdleTimeout = TimeSpan.FromMinutes(5); 
-    options.Cookie.HttpOnly = true;
-    options.Cookie.IsEssential = true;
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    var config = builder.Configuration;
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = config["JwtSettings:Issuer"],
+        ValidAudience = config["JwtSettings:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Secret"]??" "))
+    };
 });
 
 builder.Services.AddDistributedMemoryCache();
@@ -51,8 +73,9 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDesignationRepository, DesignationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
+builder.Services.AddScoped<IJwtAuthenticationRepository, JwtAuthenticationRepository>();
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
