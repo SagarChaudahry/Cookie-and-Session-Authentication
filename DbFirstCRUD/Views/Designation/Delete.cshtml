@@ -1,0 +1,15 @@
+﻿@model DbFirstCRUD.Data.Entities.Designation
+
+<h2>Delete Designation</h2>
+
+<div>
+    <p>Are you sure you want to delete the following designation?</p>
+    <p><strong>Designation ID:</strong> @Model.DesignationId</p>
+    <p><strong>Name:</strong> @Model.DesignationName</p>
+</div>
+
+<form asp-controller="Designation" asp-action="DeleteConfirmed" method="post">
+    <input type="hidden" asp-for="DesignationId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

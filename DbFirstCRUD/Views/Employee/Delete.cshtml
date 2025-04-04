@@ -1,0 +1,37 @@
+﻿@model DbFirstCRUD.Data.Entities.Employees
+
+@{
+    ViewData["Title"] = "Delete Employee";
+}
+
+<h1>Delete Employee</h1>
+
+<p>Are you sure you want to delete the following employee?</p>
+<div>
+    <p><strong>Name:</strong> @Model.Name</p>
+    <p><strong>Email:</strong> @Model.Email</p>
+    <p>
+        <strong>Department:</strong>
+        @if (ViewBag.Departments != null)
+        {
+            var department = ((IEnumerable<SelectListItem>)ViewBag.Departments)
+            .FirstOrDefault(d => d.Value == Model.DepartmentId.ToString());
+            <span>@department?.Text ?? "N/A"</span>
+        }
+    </p>
+    <p>
+        <strong>Designation:</strong>
+        @if (ViewBag.Designations != null)
+        {
+            var designation = ((IEnumerable<SelectListItem>)ViewBag.Designations)
+            .FirstOrDefault(d => d.Value == Model.DesignationId.ToString());
+            <span>@designation?.Text ?? "N/A"</span>
+        }
+    </p>
+</div>
+
+<form asp-controller="Employee" asp-action="Delete" method="POST">
+    <input type="hidden" asp-for="EmployeeId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

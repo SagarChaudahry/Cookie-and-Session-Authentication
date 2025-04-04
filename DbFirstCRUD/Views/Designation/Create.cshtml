@@ -1,0 +1,16 @@
+﻿@model DbFirstCRUD.Data.Entities.Designation
+
+<h1>Add New Designation</h1>
+
+<form asp-controller="Designation" asp-action="Create" method="post">
+    <div class="form-group">
+        <label asp-for="DesignationName" class="control-label"></label>
+        <input asp-for="DesignationName" class="form-control" required />
+        <span asp-validation-for="DesignationName" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Add Designation</button>
+    </div>
+</form>
+
+<a asp-action="Index" class="btn btn-secondary">Back to List</a>

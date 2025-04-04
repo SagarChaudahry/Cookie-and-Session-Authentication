@@ -1,0 +1,22 @@
+﻿@model DbFirstCRUD.Data.Entities.Department
+
+<h2>Department Details</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for="DepartmentId" />
+
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span> <!-- For validation messages -->
+    </div>
+    
+    <div class="form-group">
+        <label asp-for="DepartmentId" class="control-label"></label>
+        <input asp-for="DepartmentId" class="form-control" />
+        <span asp-validation-for="DepartmentId" class="text-danger"></span> <!-- For validation messages -->
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>

@@ -1,0 +1,25 @@
+﻿@model DbFirstCRUD.Data.Entities.Designation
+
+<h2>Edit Designation</h2>
+
+<form asp-action="Edit" method="post">
+    <div class="form-group">
+        <label asp-for="DesignationId"></label>
+        <input asp-for="DesignationId" class="form-control" readonly />
+    </div>
+
+    <div class="form-group">
+        <label asp-for="DesignationName"></label>
+        <input asp-for="DesignationName" class="form-control" />
+        <span asp-validation-for="DesignationName" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Save Changes</button>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
