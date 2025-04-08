@@ -12,6 +12,8 @@ namespace DbFirstCRUD
             _connectionString = configuration.GetConnectionString("DefaultConnection");
         }
 
+        public object Employees { get; internal set; }
+
         public IDbConnection CreateConnection()
         {
             return new SqlConnection(_connectionString);

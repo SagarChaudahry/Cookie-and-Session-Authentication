@@ -4,7 +4,7 @@ using System.Data;
 
 namespace DbFirstCRUD.Services
 {
-  
+        
         public class UserRepository(IDbConnection dbConnection) : IUserRepository
         {
 
@@ -21,6 +21,13 @@ namespace DbFirstCRUD.Services
                 var sql = "INSERT INTO Users (UserName,Password) VALUES (@UserName,@Password)";
                 await _dbConnection.ExecuteAsync(sql, user);
             }
+
+            
+            public async Task AssignRoleAsync(int userId, string role)
+        {
+            var sql = "Update Users SET Role @Role where UserId =@UserId";
+            await _dbConnection.ExecuteAsync(sql, new { UserId = userId, Role = role });
+        }
 
 
     }

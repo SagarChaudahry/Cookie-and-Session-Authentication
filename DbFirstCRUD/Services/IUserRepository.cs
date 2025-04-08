@@ -6,5 +6,6 @@ namespace DbFirstCRUD.Services
     {
         Task<Users?> GetByUserNameAsync(Users user);
         Task AddUserAsync(Users user);
+        Task AssignRoleAsync(int userId, string role);
     }
 }

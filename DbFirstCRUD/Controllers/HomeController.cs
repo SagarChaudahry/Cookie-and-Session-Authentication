@@ -14,17 +14,17 @@ namespace DbFirstCRUD.Controllers
         }
         public IActionResult Index()
         {
-            var userId = HttpContext.Session.GetInt32("UserId");
-            var userName = HttpContext.Session.GetString("UserName");
+            //var userId = HttpContext.Session.GetInt32("UserId");
+            //var userName = HttpContext.Session.GetString("UserName");
 
-            if (userId != null && !string.IsNullOrEmpty(userName))
-            {
-                ViewBag.UserName = userName;
-                return View();
-            }
+            //if (userId != null && !string.IsNullOrEmpty(userName))
+            //{
+            //    ViewBag.UserName = userName;
+            //    return View();
+            //}
 
-            return RedirectToAction("Login", "Authentication");
-                }
+            return View();
+        }
 
         public IActionResult Privacy()
         {

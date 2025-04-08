@@ -1,10 +1,14 @@
 ﻿using System.Reflection.Metadata.Ecma335;
+using DbFirstCRUD.CustomJwtFilter;
 using DbFirstCRUD.Data.Entities;
 using DbFirstCRUD.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DbFirstCRUD.Controllers
 {
+    [ServiceFilter(typeof(JwtAuthorizeFilter))]
+
     public class DesignationController : Controller
     {
         private readonly IDesignationRepository _designationRepository;
@@ -16,6 +20,7 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Create()
         {
             var Designation = new Designation();
@@ -23,6 +28,7 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> GetDesignationById(int DesignationId)
         {
             var Designation = await _designationRepository.GetDesignatioByIdAsync(DesignationId);
@@ -34,6 +40,7 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> AddDesignation(Designation designation)
         {
             if (ModelState.IsValid)
@@ -44,6 +51,7 @@ namespace DbFirstCRUD.Controllers
             return Ok(designation);
         }
         [HttpPut]
+
         public async Task<IActionResult> UpdateDesignation(Designation designation)
         {
             if (ModelState.IsValid)
@@ -54,6 +62,7 @@ namespace DbFirstCRUD.Controllers
             return View(designation);
         }
         [HttpDelete]
+
         public async Task<IActionResult> DeleteDesignation(int DesignationId)
         {
             await _designationRepository.DeleteDesignation(DesignationId);
@@ -61,6 +70,7 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Index()
         {
             var designations = await _designationRepository.GetAllDesignations();
@@ -68,6 +78,7 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> Create(Designation designation)
         {
             if (ModelState.IsValid)
@@ -79,6 +90,7 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> Edit(int id)
         {
             var designation = await _designationRepository.GetDesignatioByIdAsync(id);
@@ -89,6 +101,7 @@ namespace DbFirstCRUD.Controllers
             return View(designation);
         }
         [HttpPost]
+
         public async Task<IActionResult> Edit(Designation designation)
         {
             if (ModelState.IsValid)
@@ -99,6 +112,7 @@ namespace DbFirstCRUD.Controllers
             return View(designation);
         }
         [HttpGet]
+
         public async Task<IActionResult> Delete(int id)
         {
             var designation = await _designationRepository.GetDesignatioByIdAsync(id);
@@ -110,12 +124,14 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpPost]
+
         public async Task<IActionResult> DeleteConfirmed(int DesignationId)
         {
             await _designationRepository.DeleteDesignation(DesignationId);
             return RedirectToAction("Index", "Designation");
         }
         [HttpGet]
+
         public async Task<IActionResult> Details(int id)
         {
             var designation = await _designationRepository.GetDesignatioByIdAsync(id);

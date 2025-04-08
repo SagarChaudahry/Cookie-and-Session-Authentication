@@ -3,15 +3,23 @@ using DbFirstCRUD.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using DbFirstCRUD.CustomJwtFilter;
+using Microsoft.AspNetCore.Authorization.Infrastructure;
+using System.Data;
 
 namespace DbFirstCRUD.Controllers
 {
-    [Authorize]
+
+    [ServiceFilter(typeof(JwtAuthorizeFilter))]
+    //[TypeFilter(typeof(JwtAuthorizeFilter), "Admin")]
+    //[TypeFilter(typeof(JwtAuthorizeFilter), Arguments = new object[] { new string[] { "Admin" } })]
+    //[TypeFilter(typeof(JwtAuthorizeFilter), Arguments = new object[] { "Admin" })]
     public class EmployeeController : Controller
     {
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IDepartmentRepository _departmentRepo;
         private readonly IDesignationRepository _designationRepo;
+        private const int PageSize = 5;
 
         public EmployeeController(IEmployeeRepository employeeRepository, IDepartmentRepository departmentRepo, IDesignationRepository designationRepo)
         {
@@ -19,18 +27,25 @@ namespace DbFirstCRUD.Controllers
             _departmentRepo = departmentRepo;
             _designationRepo = designationRepo;
         }
-        
+
+
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1)
         {
-            // Check if the user is authenticated
-            if(HttpContext.Session.GetInt32("UserId") == null)
+            int pageSize = 5; // Set the number of records per page
+            var employees = await _employeeRepository.GetEmployeesPaged(pageNumber, pageSize);
+            var totalCount = await _employeeRepository.GetTotalEmployeeCount();
+
+            var viewModel = new PaginatedEmployeeViewModel
             {
-                return RedirectToAction("Login", "Authentication");
-            }
-            var employees = await _employeeRepository.GetAllEmployees();
-            return View(employees);
+                Employees = employees.ToList(), // Convert to List for the view
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+            };
+
+            return View(viewModel);
         }
+
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -54,6 +69,8 @@ namespace DbFirstCRUD.Controllers
 
         // Edit Employee
         [HttpGet]
+
+
         public async Task<IActionResult> Edit(int id)
         {
             var employee = await _employeeRepository.GetEmployeeById(id);
@@ -69,6 +86,7 @@ namespace DbFirstCRUD.Controllers
 
         // Edit Employee
         [HttpPost]
+
         public async Task<IActionResult> Edit(Employees employee)
         {
             if (ModelState.IsValid)
@@ -82,6 +100,7 @@ namespace DbFirstCRUD.Controllers
 
         // Delete Employee
         [HttpGet]
+
         public async Task<IActionResult> Delete(int id)
         {
             var employee = await _employeeRepository.GetEmployeeById(id);
@@ -98,7 +117,6 @@ namespace DbFirstCRUD.Controllers
         // Delete Employee 
 
         [HttpPost]
-        [ActionName("Delete")]
         public async Task<IActionResult> DeleteConfirmed(int EmployeeId)
         {
             await _employeeRepository.DeleteEmployee(EmployeeId);
@@ -106,11 +124,9 @@ namespace DbFirstCRUD.Controllers
         }
 
 
-
-
-
         // Employee Details 
         [HttpGet]
+
         public async Task<IActionResult> Details(int EmployeeId)
         {
             var employee = await _employeeRepository.GetEmployeeById(EmployeeId);

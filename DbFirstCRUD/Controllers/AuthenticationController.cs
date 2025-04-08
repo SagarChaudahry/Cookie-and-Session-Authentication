@@ -13,7 +13,7 @@
 //    {
 //        private readonly IUserRepository _userRepository;
 
-//        public AuthenticationController(IUserRepository userRepository,IJwtAuthenticationRepository jwtAuthenticationRepository)
+//        public AuthenticationController(IUserRepository userRepository, IJwtAuthenticationRepository jwtAuthenticationRepository)
 //        {
 //            _userRepository = userRepository;
 
@@ -67,7 +67,7 @@
 //                new Claim(ClaimTypes.Name, existingUser.UserName),
 //                new Claim(ClaimTypes.NameIdentifier, existingUser.UserId.ToString()),
 //                new Claim(ClaimTypes.Role, "User")
-                
+
 //            };
 
 //            var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -75,7 +75,7 @@
 //            {
 //                IsPersistent = true
 //            };
-//            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity),authProperties);
+//            await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity), authProperties);
 
 //            return RedirectToAction("Index", "Home");
 //        }

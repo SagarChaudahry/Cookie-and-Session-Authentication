@@ -15,9 +15,10 @@ namespace DbFirstCRUD.Services
         {
             _db = db;
         }
-            
+
         public async Task<IEnumerable<Employees>> GetAllEmployees()
         {
+
             using (var connection = _db.CreateConnection())
             {
                 string sql = "Select * from GetAllEmployees()";
@@ -34,7 +35,6 @@ namespace DbFirstCRUD.Services
             }
         }
 
-
         public async Task AddEmployee(Employees employee)
         {
             string sql = "AddEmployee";
@@ -48,7 +48,7 @@ namespace DbFirstCRUD.Services
                     Email = employee.Email,
                     DepartmentId = employee.DepartmentId,
                     DesignationId = employee.DesignationId
-                },commandType:CommandType.StoredProcedure);
+                }, commandType: CommandType.StoredProcedure);
             }
         }
 
@@ -73,17 +73,44 @@ namespace DbFirstCRUD.Services
         public async Task DeleteEmployee(int EmployeeId)
         {
             string sql = "DELETE FROM Employees WHERE EmployeeId = @EmployeeId";
-            
+
 
             using (var connection = _db.CreateConnection())
             {
                 await connection.ExecuteAsync(sql, new { EmployeeId });
             }
+        }
+
+        //public async Task<IEnumerable<Employees>> GetEmployeePaged(int pageNumber, int pageSize)
+        //{
+        //    return await _db.Employees
+        //        .OrderBy(e => e.EmployeeId)
+        //        .Skip((pageNumber - 1) * pageSize)
+        //        .Take(pageSize)
+        //        .ToListAsync();
+        //}
 
 
 
+        public async Task<IEnumerable<Employees>> GetEmployeesPaged(int pageNumber, int pageSize)
+        {
+            string sql = "SELECT * FROM dbo.fn_GetEmployeesPaged(@PageNumber, @PageSize)";
+            using (var connection = _db.CreateConnection())
+            {
+                return await connection.QueryAsync<Employees>(sql, new { PageNumber = pageNumber, PageSize = pageSize });
+            }
+        }
 
+        public async Task<double> GetTotalEmployeeCount()
+        {
+            string sql = "SELECT COUNT(*) FROM Employees";
+
+            using (var connection = _db.CreateConnection())
+            {
+                var count = await connection.ExecuteScalarAsync<int>(sql);
+                return Convert.ToDouble(count);
+            }
         }
     }
-    
+
 }

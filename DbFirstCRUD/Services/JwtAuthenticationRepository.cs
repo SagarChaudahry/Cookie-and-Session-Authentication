@@ -16,7 +16,7 @@ namespace DbFirstCRUD.Services
         private readonly IConfiguration _configuration;
         private readonly ApplicationDbContext _db;
 
-        public JwtAuthenticationRepository(ApplicationDbContext db ,IUserRepository userRepository, IConfiguration configuration)
+        public JwtAuthenticationRepository(ApplicationDbContext db, IUserRepository userRepository, IConfiguration configuration)
         {
             _userRepository = userRepository;
             _configuration = configuration;
@@ -26,8 +26,10 @@ namespace DbFirstCRUD.Services
         public async Task<Users?> ValidateUserAsync(string username, string password)
         {
             var sql = "SELECT * FROM Users WHERE UserName = @UserName and Password = @Password";
-            var user = await _db.CreateConnection().QueryFirstOrDefaultAsync<Users>(sql, new { UserName = username,
-                Password = password 
+            var user = await _db.CreateConnection().QueryFirstOrDefaultAsync<Users>(sql, new
+            {
+                UserName = username,
+                Password = password
             });
 
             if (user == null)
@@ -43,8 +45,8 @@ namespace DbFirstCRUD.Services
 
         public async Task<string> GenerateTokenAsync(Users user)
         {
-            var jwtKey = _configuration["JwtSettings:Secret"];
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+            var jwtKey = _configuration["jwt setting:SecretKey"];
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtKey));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
@@ -55,8 +57,8 @@ namespace DbFirstCRUD.Services
             };
 
             var token = new JwtSecurityToken(
-                issuer: _configuration["JwtSettings:Issuer"],
-                audience: _configuration["JwtSettings:Audience"],
+                issuer: _configuration["jwt setting:Issuer"],
+                audience: _configuration["jwt setting:Audience"],
                 claims: claims,
                 expires: DateTime.UtcNow.AddHours(1),
                 signingCredentials: credentials
@@ -65,5 +67,42 @@ namespace DbFirstCRUD.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public bool ValidateToken(string Token)
+        {
+            var key = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_configuration["jwt setting:SecretKey"]));
+            var tokenHandler = new JwtSecurityTokenHandler();
+
+            try
+            {
+                tokenHandler.ValidateToken(Token, new TokenValidationParameters
+                {
+
+                    IssuerSigningKey = key,
+                    ValidateIssuer = true,
+                    ValidateAudience = true,
+                    ClockSkew = TimeSpan.Zero,
+                    ValidIssuer = _configuration["jwt setting:Issuer"],
+                    ValidAudience = _configuration["jwt setting:Audience"],
+                    ValidateLifetime = true
+                }, out var validatedToken);
+
+                return true;
+
+
+            }
+
+            catch
+            {
+                return false;
+            }
+        }
+
+        public ClaimsPrincipal GetClaimsFromToken(string token)
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadToken(token) as JwtSecurityToken;
+
+            return jwtToken != null ? new ClaimsPrincipal(new ClaimsIdentity(jwtToken.Claims)) : null;
+        }
     }
 }

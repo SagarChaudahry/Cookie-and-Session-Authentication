@@ -1,5 +1,6 @@
 using Dapper;
 using DbFirstCRUD;
+using DbFirstCRUD.CustomJwtFilter;
 using DbFirstCRUD.Data.Entities;
 using DbFirstCRUD.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -14,8 +15,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddScoped<IJwtAuthenticationRepository, JwtAuthenticationRepository>();
+
+builder.Services.AddScoped<JwtAuthorizeFilter>();
+
 // Register IDbConnection with SqlConnection
-builder.Services.AddSingleton<IDbConnection>(serviceProvider =>
+builder.Services.AddScoped<IDbConnection>(serviceProvider =>
 {
     // Get the connection string from appsettings.json
     var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
@@ -38,37 +43,55 @@ builder.Services.AddSingleton<IDbConnection>(serviceProvider =>
 //Session
 //builder.Services.AddSession(options =>
 //{
-//    options.IdleTimeout = TimeSpan.FromMinutes(5); 
+//    options.IdleTimeout = TimeSpan.FromMinutes(5);
 //    options.Cookie.HttpOnly = true;
 //    options.Cookie.IsEssential = true;
 //});
 
 
 //JWT Authentication
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    var config = builder.Configuration;
-    options.TokenValidationParameters = new TokenValidationParameters
+var key = Encoding.ASCII.GetBytes(builder.Configuration["jwt setting:SecretKey"]);
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
     {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = config["JwtSettings:Issuer"],
-        ValidAudience = config["JwtSettings:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(config["JwtSettings:Secret"]??" "))
-    };
+        options.RequireHttpsMetadata = false;
+        options.SaveToken = true;
+        options.Events = new JwtBearerEvents
+        {
+            OnMessageReceived = context =>
+            {
+                // Extract JWT from Cookie instead of Authorization header
+                var token = context.Request.Cookies["AuthToken"];
+                if (!string.IsNullOrEmpty(token))
+                {
+                    context.Token = token;
+                }
+                return Task.CompletedTask;
+            }
+        };
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ValidIssuer = builder.Configuration["jwt setting:Issuer"],
+            ValidAudience = builder.Configuration["jwt setting:Audience"],
+            ClockSkew = TimeSpan.Zero
+        };
+    });
+
+
+//Add Authorization
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("UserOnly", policy => policy.RequireRole("User"));
 });
 
 
 
-
-builder.Services.AddDistributedMemoryCache();
+//builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSingleton<ApplicationDbContext>();
 
 // Register repositories
@@ -76,7 +99,10 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDesignationRepository, DesignationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IJwtAuthenticationRepository, JwtAuthenticationRepository>();
+
+
+
+
 var app = builder.Build();
 
 
@@ -91,7 +117,7 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 //Middleware
-app.UseSession();
+//app.UseSession();
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
