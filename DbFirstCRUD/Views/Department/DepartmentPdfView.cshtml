@@ -1,0 +1,25 @@
+﻿@model List<DbFirstCRUD.Data.Entities.Department>
+
+@{
+    Layout = null; // No layout for PDF rendering or use _Layout if you need layout
+}
+
+<h2>Department List</h2>
+
+<table border="1" cellpadding="5" cellspacing="0">
+    <thead>
+        <tr>
+            <th>Department Name</th>
+            <th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var department in Model)
+        {
+            <tr>
+                <td>@department.DepartmentId</td>
+                <td>@department.Name</td>
+            </tr>
+        }
+    </tbody>
+</table>

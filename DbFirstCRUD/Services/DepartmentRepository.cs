@@ -74,27 +74,26 @@ namespace DbFirstCRUD.Services
 
         }
 
+       
+
         public async Task<IEnumerable<Department>> GetDepartmentsPaged(int pageNumber, int pageSize)
         {
-            string Sql = "SELECT * FROM GetAllDepartmentsPaged(@PageNumber, @PageSize)";
-
-           using (var connection = _db.CreateConnection())
+            string sql = "SELECT * FROM dbo.fn_GetDepartmentPaged(@PageNumber, @PageSize)";
+            using (var connection = _db.CreateConnection())
             {
-                return await connection.QueryAsync<Department>(Sql, new { PageNumber = pageNumber, PageSize = pageSize });
+                return await connection.QueryAsync<Department>(sql, new { PageNumber = pageNumber, PageSize = pageSize });
             }
-        }        
-
+        }
 
         public async Task<double> GetTotalDepartmentCount()
         {
             string sql = "SELECT COUNT(*) FROM Departments";
+
             using (var connection = _db.CreateConnection())
             {
                 var count = await connection.ExecuteScalarAsync<int>(sql);
                 return Convert.ToDouble(count);
             }
         }
-
-      
     }
 }

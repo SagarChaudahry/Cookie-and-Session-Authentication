@@ -28,30 +28,43 @@ namespace DbFirstCRUD.Services
         public async Task AddDesignation(Designation designation)
         {
             string sql = "AddDesignation"; // Call the stored procedure
-            // Since DesignationId is auto-generated, we do not pass it here
             await _dbConnection.ExecuteAsync(sql, new
             {
-                DesignationName = designation.DesignationName // Only pass the name
+                DesignationName = designation.DesignationName
             }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task UpdateDesignation(Designation designation)
         {
             string sql = "UpdateDesignation"; // Call the stored procedure
-
-            // Ensure both DesignationId and DesignationName are passed
             await _dbConnection.ExecuteAsync(sql, new
             {
-                DesignationId = designation.DesignationId, // Include DesignationId
-                DesignationName = designation.DesignationName // Include DesignationName
+                DesignationId = designation.DesignationId,
+                DesignationName = designation.DesignationName
             }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task DeleteDesignation(int designationId)
         {
             string sql = "DeleteDesignation"; // Call the stored procedure
-            // Ensure DesignationId is passed
             await _dbConnection.ExecuteAsync(sql, new { DesignationId = designationId }, commandType: CommandType.StoredProcedure);
+        }
+
+        public async Task<IEnumerable<Designation>> GetDesignationsPaged(int pageNumber, int pageSize)
+        {
+            string sql = "SELECT * FROM dbo.fn_GetDesignationPaged(@PageNumber, @PageSize)"; // Corrected function name and model
+            return await _dbConnection.QueryAsync<Designation>(sql, new
+            {
+                PageNumber = pageNumber,
+                PageSize = pageSize
+            });
+        }
+
+        public async Task<double> GetTotalDesignationCount()
+        {
+            string sql = "SELECT COUNT(*) FROM Designation"; // Corrected table name
+            var count = await _dbConnection.ExecuteScalarAsync<int>(sql);
+            return Convert.ToDouble(count);
         }
     }
 }

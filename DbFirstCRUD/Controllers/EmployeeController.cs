@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DbFirstCRUD.CustomJwtFilter;
 using Microsoft.AspNetCore.Authorization.Infrastructure;
 using System.Data;
+using Rotativa.AspNetCore;
 
 namespace DbFirstCRUD.Controllers
 {
@@ -30,9 +31,9 @@ namespace DbFirstCRUD.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> Index(int pageNumber = 1)
+        public async Task<IActionResult> Index(int pageNumber = 1,int pageSize = 5)
         {
-            int pageSize = 5; // Set the number of records per page
+            
             var employees = await _employeeRepository.GetEmployeesPaged(pageNumber, pageSize);
             var totalCount = await _employeeRepository.GetTotalEmployeeCount();
 
@@ -40,12 +41,13 @@ namespace DbFirstCRUD.Controllers
             {
                 Employees = employees.ToList(), // Convert to List for the view
                 CurrentPage = pageNumber,
-                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
+                TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize),
+                PageSize = pageSize
             };
 
             return View(viewModel);
-        }
 
+        }
 
         [HttpGet]
         public async Task<IActionResult> Create()
@@ -69,7 +71,6 @@ namespace DbFirstCRUD.Controllers
 
         // Edit Employee
         [HttpGet]
-
 
         public async Task<IActionResult> Edit(int id)
         {
@@ -137,6 +138,23 @@ namespace DbFirstCRUD.Controllers
 
             return View(employee);
         }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportToPdf()
+        {
+            var employees = await _employeeRepository.GetAllEmployees(); 
+
+            return new ViewAsPdf("EmployeePdfView", employees.ToList())
+            {
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                FileName = "EmployeesList.pdf"
+            };
+        }
+
+
+
+
 
         // Populate dropdowns for departments and designations
         private async Task PopulateDropdowns()

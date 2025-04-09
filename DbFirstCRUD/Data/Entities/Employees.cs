@@ -10,6 +10,7 @@ namespace DbFirstCRUD.Data.Entities
 
         [Required(ErrorMessage = "Name is required.")]
         public string Name { get; set; } = string.Empty;
+        public string EmployeeName { get; set; }
 
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid Email Address")]

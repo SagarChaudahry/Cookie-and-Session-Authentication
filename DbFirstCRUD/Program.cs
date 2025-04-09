@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Data.SqlClient;
 using Microsoft.IdentityModel.Tokens;
+using Rotativa.AspNetCore;
 using System.Data;
 using System.Text;
 
@@ -90,7 +91,6 @@ builder.Services.AddAuthorization(options =>
 });
 
 
-
 //builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSingleton<ApplicationDbContext>();
 
@@ -99,8 +99,6 @@ builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 builder.Services.AddScoped<IDepartmentRepository, DepartmentRepository>();
 builder.Services.AddScoped<IDesignationRepository, DesignationRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-
-
 
 
 var app = builder.Build();
@@ -125,5 +123,12 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+
+//string wwwroot = app.Environment.WebRootPath;
+//Rotativa.AspNetCore.RotativaConfiguration.Setup(wwwroot, "Rotativa");
+
+RotativaConfiguration.Setup(app.Environment.WebRootPath, "Rotativa");
+
 
 app.Run();

@@ -1,18 +1,15 @@
-﻿using System.Reflection.Metadata.Ecma335;
-using DbFirstCRUD.CustomJwtFilter;
+﻿using DbFirstCRUD.CustomJwtFilter;
 using DbFirstCRUD.Data.Entities;
 using DbFirstCRUD.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Rotativa.AspNetCore;
 
 namespace DbFirstCRUD.Controllers
 {
     [ServiceFilter(typeof(JwtAuthorizeFilter))]
-
     public class DesignationController : Controller
     {
         private readonly IDesignationRepository _designationRepository;
-
 
         public DesignationController(IDesignationRepository designationRepository)
         {
@@ -20,126 +17,137 @@ namespace DbFirstCRUD.Controllers
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> Create()
+        public async Task<IActionResult> Index(int pageNumber = 1)
         {
-            var Designation = new Designation();
-            return View(Designation);
+            int pageSize = 5;
+            var designations = await _designationRepository.GetDesignationsPaged(pageNumber, pageSize);
+            var totalCount = await _designationRepository.GetTotalDesignationCount();
+
+            var viewModel = new PaginatedDesignationViewModel
+            {
+                Designations = designations.ToList(),
+                CurrentPage = pageNumber,
+                TotalPages = (int)Math.Ceiling(totalCount / pageSize)
+            };
+
+            return View(viewModel);
         }
 
         [HttpGet]
-
-        public async Task<IActionResult> GetDesignationById(int DesignationId)
+        public IActionResult Create()
         {
-            var Designation = await _designationRepository.GetDesignatioByIdAsync(DesignationId);
-            if (Designation == null)
-            {
-                return View(Designation);
-            }
-            return Ok(Designation);
+            return View(new Designation());
         }
 
         [HttpPost]
-
-        public async Task<IActionResult> AddDesignation(Designation designation)
-        {
-            if (ModelState.IsValid)
-            {
-                await _designationRepository.AddDesignation(designation);
-                return RedirectToAction("GetDesignations");
-            }
-            return Ok(designation);
-        }
-        [HttpPut]
-
-        public async Task<IActionResult> UpdateDesignation(Designation designation)
-        {
-            if (ModelState.IsValid)
-            {
-                await _designationRepository.UpdateDesignation(designation);
-                return RedirectToAction("GetDesignations");
-            }
-            return View(designation);
-        }
-        [HttpDelete]
-
-        public async Task<IActionResult> DeleteDesignation(int DesignationId)
-        {
-            await _designationRepository.DeleteDesignation(DesignationId);
-            return RedirectToAction("GetDesignations");
-        }
-
-        [HttpGet]
-
-        public async Task<IActionResult> Index()
-        {
-            var designations = await _designationRepository.GetAllDesignations();
-            return View(designations);
-        }
-
-        [HttpPost]
-
         public async Task<IActionResult> Create(Designation designation)
         {
             if (ModelState.IsValid)
             {
                 await _designationRepository.AddDesignation(designation);
-                return RedirectToAction("Index", "Designation");
+                return RedirectToAction("Index");
             }
             return View(designation);
         }
 
         [HttpGet]
-
         public async Task<IActionResult> Edit(int id)
         {
             var designation = await _designationRepository.GetDesignatioByIdAsync(id);
             if (designation == null)
-            {
                 return NotFound();
-            }
+
             return View(designation);
         }
-        [HttpPost]
 
+        [HttpPost]
         public async Task<IActionResult> Edit(Designation designation)
         {
             if (ModelState.IsValid)
             {
                 await _designationRepository.UpdateDesignation(designation);
-                return RedirectToAction("Index", "Designation");
+                return RedirectToAction("Index");
             }
             return View(designation);
         }
-        [HttpGet]
 
+        [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {
             var designation = await _designationRepository.GetDesignatioByIdAsync(id);
             if (designation == null)
-            {
                 return NotFound();
-            }
+
             return View(designation);
         }
 
-        [HttpPost]
-
-        public async Task<IActionResult> DeleteConfirmed(int DesignationId)
+        [HttpPost, ActionName("Delete")]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _designationRepository.DeleteDesignation(DesignationId);
-            return RedirectToAction("Index", "Designation");
+            await _designationRepository.DeleteDesignation(id);
+            return RedirectToAction("Index");
         }
-        [HttpGet]
 
+        [HttpGet]
         public async Task<IActionResult> Details(int id)
         {
             var designation = await _designationRepository.GetDesignatioByIdAsync(id);
             if (designation == null)
-            {
                 return NotFound();
+
+            return View(designation);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetDesignationById(int designationId)
+        {
+            var designation = await _designationRepository.GetDesignatioByIdAsync(designationId);
+            if (designation == null)
+                return NotFound();
+
+            return Ok(designation);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddDesignation(Designation designation)
+        {
+            if (ModelState.IsValid)
+            {
+                await _designationRepository.AddDesignation(designation);
+                return RedirectToAction("Index");
             }
             return View(designation);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateDesignation(Designation designation)
+        {
+            if (ModelState.IsValid)
+            {
+                await _designationRepository.UpdateDesignation(designation);
+                return RedirectToAction("Index");
+            }
+            return View(designation);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteDesignation(int designationId)
+        {
+            await _designationRepository.DeleteDesignation(designationId);
+            return RedirectToAction("Index");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> ExportToPdf()
+        {
+            var departments = await _designationRepository.GetAllDesignations();
+
+            return new ViewAsPdf("DesignationPdfView", departments.ToList())
+            {
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                FileName = "DesignationsList.pdf"
+            };
         }
     }
 }

@@ -10,35 +10,28 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Department ID</th>
             <th>Department Name</th>
+            <th>DepartmentId</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         @if (Model.Departments != null && Model.Departments.Count > 0)
         {
-            foreach (var department in Model.Departments)
+            foreach (var dept in Model.Departments)
             {
                 <tr>
-                    <td>@department.DepartmentId</td>
-                    <td>@department.Name</td>
+                    <td>@dept.DepartmentId</td>
+                    <td>@dept.Name</td>
                     <td>
-                        <a asp-action="Details" asp-route-id="@department.DepartmentId" class="btn btn-info btn-sm">View</a>
-                        <a asp-action="Edit" asp-route-id="@department.DepartmentId" class="btn btn-primary btn-sm">Edit</a>
-                        <a asp-action="Delete" asp-route-id="@department.DepartmentId"
-                           class="btn btn-danger btn-sm"
-                           onclick="return confirm('Are you sure you want to delete this department?');">Delete</a>
+                        <a asp-action="Details" asp-route-id="@dept.DepartmentId" class="btn btn-info">View</a>
+                        <a asp-action="Edit" asp-route-id="@dept.DepartmentId" class="btn btn-primary">Edit</a>
+                        <a asp-action="Delete" asp-route-id="@dept.DepartmentId" class="btn btn-danger">Delete</a>
                     </td>
                 </tr>
             }
         }
-        else
-        {
-            <tr>
-                <td colspan="3" class="text-center">No departments available.</td>
-            </tr>
-        }
+       
     </tbody>
 </table>
 

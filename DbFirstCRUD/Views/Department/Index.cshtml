@@ -67,14 +67,33 @@
                 </tr>
             }
         }
-        else
+      @*   else
         {
             <tr>
                 <td colspan="3" class="text-center">No departments available.</td>
             </tr>
-        }
+        } *@
     </tbody>
 </table>
+
+<a asp-action="Create" class="btn btn-success">Add New Department</a>
+<a href="@Url.Action("ExportToPdf", "Department")" class="btn btn-danger">Export to PDF</a>
+
+
+<form asp-action="Index" asp-route-pageSize="@Model.PageSize" method="get" class="form-inline mb-3">
+    <label for="pageSize" class="mr-2">Show:</label>
+    <select name="pageSize" class="form-control mr-2" onchange="this.form.submit()">
+        <option value="10" selected="@(Model.PageSize == 10 ? "selected" : "")">10</option>
+        <option value="20" selected="@(Model.PageSize == 20 ? "selected" : "")">20</option>
+        <option value="30" selected="@(Model.PageSize == 30 ? "selected" : "")">30</option>
+        <option value="40" selected="@(Model.PageSize == 40 ? "selected" : "")">40</option>
+        <option value="50" selected="@(Model.PageSize == 50 ? "selected" : "")">50</option>
+    </select>
+    <span>rows per page</span>
+</form>
+
+
+
 
 <!-- Pagination Controls -->
 <nav aria-label="Page navigation">
@@ -100,7 +119,7 @@
     <p>Showing page @Model.CurrentPage of @Model.TotalPages.</p>
 </div>
 
-<!-- Add New Department Button -->
+@* <!-- Add New Department Button -->
 <div class="text-right">
     <a asp-action="Create" class="btn btn-success">Add New Department</a>
-</div>
+</div> *@

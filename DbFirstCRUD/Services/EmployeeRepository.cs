@@ -81,14 +81,6 @@ namespace DbFirstCRUD.Services
             }
         }
 
-        //public async Task<IEnumerable<Employees>> GetEmployeePaged(int pageNumber, int pageSize)
-        //{
-        //    return await _db.Employees
-        //        .OrderBy(e => e.EmployeeId)
-        //        .Skip((pageNumber - 1) * pageSize)
-        //        .Take(pageSize)
-        //        .ToListAsync();
-        //}
 
 
 

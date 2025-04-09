@@ -3,6 +3,7 @@ using DbFirstCRUD.Data.Entities;
 using DbFirstCRUD.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Rotativa.AspNetCore;
 
 namespace DbFirstCRUD.Controllers
 {
@@ -17,25 +18,7 @@ namespace DbFirstCRUD.Controllers
             _departmentRepository = departmentRepository;
         }
 
-        // GET: Department/Index
-        //[HttpGet]
-        //public async Task<IActionResult> Index(int pageNumber = 1)
-        //{
-        //    int pageSize = 5; // Set the number of records per page
-        //    var employees = await _departmentRepository.GetDepartmentPaged(pageNumber, pageSize);
-        //    var totalCount = await _departmentRepository.GetTotalDepartmentCount();
-
-         
-
-        //    var viewModel = new PaginatedDepartmentViewModel
-        //    {
-        //        Department= employees.ToList(), // Convert to List for the view
-        //        CurrentPage = pageNumber,
-        //        TotalPages = (int)Math.Ceiling(totalCount / (double)pageSize)
-        //    };
-
-        //    return View(viewModel);
-        //}
+        
         [HttpGet]
         public async Task<IActionResult> Index(int pageNumber = 1)
         {
@@ -52,14 +35,6 @@ namespace DbFirstCRUD.Controllers
             return View(viewModel); // Return the view with the view model containing department data
         }
 
-
-        [HttpGet]
-
-        public async Task<IActionResult> Index()
-        {
-            var departments = await _departmentRepository.GetAllDepartments();
-            return View(departments);
-        }
 
         // GET: Department/Create
         [HttpGet]
@@ -142,6 +117,20 @@ namespace DbFirstCRUD.Controllers
         {
             await _departmentRepository.DeleteDepartment(id);
             return RedirectToAction("Index"); // Redirect to the index action after deletion
+        }
+
+
+        [HttpGet]
+        public async Task<IActionResult> ExportToPdf()
+        {
+            var departments = await _departmentRepository.GetAllDepartments();
+
+            return new ViewAsPdf("DepartmentPdfView", departments.ToList())
+            {
+                PageSize = Rotativa.AspNetCore.Options.Size.A4,
+                PageOrientation = Rotativa.AspNetCore.Options.Orientation.Portrait,
+                FileName = "DepartmentList.pdf"
+            };
         }
     }
 }
