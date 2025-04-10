@@ -44,11 +44,15 @@ namespace DbFirstCRUD.Services
             }, commandType: CommandType.StoredProcedure);
         }
 
-        public async Task DeleteDesignation(int designationId)
+        public async Task DeleteDesignation(int DesignationId)
         {
-            string sql = "DeleteDesignation"; // Call the stored procedure
-            await _dbConnection.ExecuteAsync(sql, new { DesignationId = designationId }, commandType: CommandType.StoredProcedure);
+            string sql = "DeleteDesignation"; // Call the stored procedurea
+            DynamicParameters p = new DynamicParameters();
+            p.Add("@DesignationId", DesignationId);
+            await _dbConnection.ExecuteAsync(sql, p, commandType: CommandType.StoredProcedure);
         }
+
+
 
         public async Task<IEnumerable<Designation>> GetDesignationsPaged(int pageNumber, int pageSize)
         {

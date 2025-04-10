@@ -44,8 +44,8 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Department ID</th>
-            <th>Department Name</th>
+@*             <th>Department ID</th>
+ *@            <th>Department Name</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -55,8 +55,8 @@
             foreach (var department in Model.Departments)
             {
                 <tr>
-                    <td>@department.DepartmentId</td>
-                    <td>@department.Name</td>
+@*                     <td>@department.DepartmentId</td>
+ *@                    <td>@department.Name</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@department.DepartmentId" class="btn btn-info btn-sm">View</a>
                         <a asp-action="Edit" asp-route-id="@department.DepartmentId" class="btn btn-primary btn-sm">Edit</a>
