@@ -81,9 +81,6 @@ namespace DbFirstCRUD.Services
             }
         }
 
-
-
-
         public async Task<IEnumerable<Employees>> GetEmployeesPaged(int pageNumber, int pageSize)
         {
             string sql = "SELECT * FROM dbo.fn_GetEmployeesPaged(@PageNumber, @PageSize)";

@@ -81,7 +81,9 @@ namespace DbFirstCRUD.Controllers
             return View(designation);
         }
 
-        [HttpPost, ActionName("Delete")]
+
+
+        [HttpPost, ActionName("DeleteConfirmed")]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
             await _designationRepository.DeleteDesignation(id);

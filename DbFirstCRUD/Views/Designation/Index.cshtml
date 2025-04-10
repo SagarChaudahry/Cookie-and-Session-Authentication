@@ -41,8 +41,8 @@
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>Designation ID</th>
-            <th>Designation Name</th>
+@*             <th>Designation ID</th>
+ *@            <th>Designation Name</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -52,8 +52,8 @@
             foreach (var designation in Model.Designations)
             {
                 <tr>
-                    <td>@designation.DesignationId</td>
-                    <td>@designation.DesignationName</td>
+@*                     <td>@designation.DesignationId</td>
+ *@                    <td>@designation.DesignationName</td>
                     <td>
                         <a asp-action="Details" asp-route-id="@designation.DesignationId" class="btn btn-info">View</a>
                         <a asp-action="Edit" asp-route-id="@designation.DesignationId" class="btn btn-primary">Edit</a>
