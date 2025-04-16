@@ -18,6 +18,11 @@ builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IJwtAuthenticationRepository, JwtAuthenticationRepository>();
 
+builder.Services.AddScoped<ExcelExportServices>();
+
+
+
+
 builder.Services.AddScoped<JwtAuthorizeFilter>();
 
 // Register IDbConnection with SqlConnection

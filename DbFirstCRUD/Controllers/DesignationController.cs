@@ -71,6 +71,7 @@ namespace DbFirstCRUD.Controllers
             return View(designation);
         }
 
+
         [HttpGet]
         public async Task<IActionResult> Delete(int id)
         {

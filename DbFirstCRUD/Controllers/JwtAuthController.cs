@@ -33,7 +33,7 @@ namespace DbFirstCRUD.Controllers
             if (existingUser != null)
                 return BadRequest("User already exists.");
 
-            //users.Password = HashPassword(users.Password);
+            users.Password = HashPassword(users.Password);
 
 
             users.Role = "User"; //
@@ -60,11 +60,11 @@ namespace DbFirstCRUD.Controllers
             if (existingUser == null)
                 return BadRequest("User Does Not Exist.");
 
-            //var passwordHasher = new PasswordHasher<Users>();
-            //var result = passwordHasher.VerifyHashedPassword(existingUser, existingUser.Password, user.Password);
+            var passwordHasher = new PasswordHasher<Users>();
+            var result = passwordHasher.VerifyHashedPassword(existingUser, existingUser.Password, user.Password);
 
-            //if (result == PasswordVerificationResult.Failed)
-            //    return BadRequest("Invalid password.");
+            if (result == PasswordVerificationResult.Failed)
+                return BadRequest("Invalid password.");
 
 
             var token = await _jwtAuthRepository.GenerateTokenAsync(existingUser);
@@ -78,12 +78,12 @@ namespace DbFirstCRUD.Controllers
             });
 
             return RedirectToAction("Index", "Employee");
-            //return Ok(new
-            //{
-            //    message = "Logged in Successfully",
-            //    user = existingUser,
-            //    token = token
-            //});
+            return Ok(new
+            {
+                message = "Logged in Successfully",
+                user = existingUser,
+                token = token
+            });
 
         }
 
@@ -92,34 +92,34 @@ namespace DbFirstCRUD.Controllers
             Response.Cookies.Delete("AuthToken");
             return RedirectToAction("Login");
         }
-        //    private string GenerateToken(Users user)
-        //    {
-        //        var jwtKey = " ";
-        //        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
+        private string GenerateToken(Users user)
+        {
+            var jwtKey = " ";
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
 
-        //        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-        //        var claims = new[]
-        //        {
-        //    new Claim(ClaimTypes.Name, user.UserName),
-        //    new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-        //    new Claim(ClaimTypes.Role, user.Role ?? "User")
-        //};
-        //        var token = new JwtSecurityToken(
-        //            issuer: " ",
-        //            audience: " ",
-        //            claims: claims,
-        //            expires: DateTime.UtcNow.AddHours(1),
-        //            signingCredentials: credentials
-        //        );
+            var claims = new[]
+            {
+            new Claim(ClaimTypes.Name, user.UserName),
+            new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+            new Claim(ClaimTypes.Role, user.Role ?? "User")
+        };
+            var token = new JwtSecurityToken(
+                issuer: " ",
+                audience: " ",
+                claims: claims,
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: credentials
+            );
 
-        //        return new JwtSecurityTokenHandler().WriteToken(token);
-        //    }
-        //    private string HashPassword(string password)
-        //    {
-        //        var passwordHasher = new PasswordHasher<Users>();
-        //        return passwordHasher.HashPassword(new Users(), password);
-        //    }
+            return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+        private string HashPassword(string password)
+        {
+            var passwordHasher = new PasswordHasher<Users>();
+            return passwordHasher.HashPassword(new Users(), password);
+        }
 
     }
 }
